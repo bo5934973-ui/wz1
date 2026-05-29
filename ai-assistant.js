@@ -9,7 +9,7 @@
     ])
   );
   const fallback = "目前网站资料中没有相关信息，可以通过联系方式进一步咨询 Jason。";
-  const starters = ["你擅长哪些设计？", "帮我想个海报方向", "怎么合作？"];
+  const starters = ["随便聊聊", "帮我想个海报方向", "看看我的想法"];
   const state = {
     open: false,
     loading: false,
@@ -17,7 +17,7 @@
       {
         role: "assistant",
         content:
-          "你好，我是 Jason的助手。可以向我了解 Jason 的设计服务，也可以问我设计、品牌、视觉和作品集相关问题。"
+          "嗨，我是 Jason的助手。你可以问我 Jason 的设计服务，也可以直接丢一个想法、图片方向或灵感问题过来，我会尽量像个真实的设计搭子一样陪你聊。"
       }
     ]
   };
