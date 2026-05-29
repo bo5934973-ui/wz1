@@ -80,6 +80,15 @@ function answerRealtimeQuestion(message) {
   return `今天是${date.dateText}。`;
 }
 
+function getFixedReply(message) {
+  const text = message.toLowerCase().replace(/\s+/g, "");
+  const match = siteKnowledge.fixedReplies?.find((item) =>
+    item.keywords.some((keyword) => text.includes(String(keyword).toLowerCase()))
+  );
+
+  return match?.answer || "";
+}
+
 function needsWebVerification(message) {
   const text = message.toLowerCase();
   return [
@@ -231,6 +240,12 @@ export async function handler(event) {
   }
 
   const userMessage = messages[messages.length - 1].content;
+
+  const fixedReply = getFixedReply(userMessage);
+  if (fixedReply) {
+    return json(200, { answer: fixedReply });
+  }
+
   const realtimeAnswer = answerRealtimeQuestion(userMessage);
   if (realtimeAnswer) {
     return json(200, { answer: realtimeAnswer });
