@@ -65,14 +65,33 @@
       }
       .project-info-panel {
         background:
-          linear-gradient(135deg, rgba(22, 27, 30, 0.68), rgba(10, 12, 14, 0.46)),
-          rgba(18, 22, 24, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.28);
+          linear-gradient(135deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.08)),
+          linear-gradient(160deg, rgba(16, 20, 24, 0.42), rgba(16, 20, 24, 0.18));
+        border: 1px solid rgba(255, 255, 255, 0.38);
+        border-radius: 24px;
         box-shadow:
-          0 24px 70px rgba(0, 0, 0, 0.32),
-          inset 0 1px 0 rgba(255, 255, 255, 0.24);
-        -webkit-backdrop-filter: blur(26px) saturate(1.45);
-        backdrop-filter: blur(26px) saturate(1.45);
+          0 24px 70px rgba(0, 0, 0, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.42);
+        -webkit-backdrop-filter: blur(22px) saturate(1.55);
+        backdrop-filter: blur(22px) saturate(1.55);
+      }
+      .project-info-kicker,
+      .project-info-action {
+        color: rgba(255, 255, 255, 0.84);
+        text-shadow: 0 1px 12px rgba(0, 0, 0, 0.34);
+      }
+      .project-info-title {
+        color: #ffffff;
+        letter-spacing: 0;
+        text-shadow: 0 2px 18px rgba(0, 0, 0, 0.42);
+      }
+      .project-info-track {
+        background: rgba(255, 255, 255, 0.28);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
+      }
+      .project-info-bar {
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 0 18px rgba(255, 255, 255, 0.18);
       }
       .project-card-image::before {
         content: "";
@@ -80,8 +99,8 @@
         inset: 0;
         z-index: 1;
         background:
-          linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.34)),
-          radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.24), transparent 42%);
+          linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.28)),
+          radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.26), transparent 45%);
         pointer-events: none;
       }
     </style>
@@ -187,15 +206,15 @@
               ...projects.map(([title, type, summary, accent, img], index) =>
                 h(motion.article, { ...fade, onClick: () => openImage(title, img, type), whileHover: { y: -10 }, whileTap: { scale: .985 }, transition: { duration: .45, ease: [0.22, 1, 0.36, 1] }, key: title, className: "group cursor-pointer overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/72 shadow-sm backdrop-blur-xl" },
                   h("div", { className: `project-card-image relative h-80 overflow-hidden bg-gradient-to-br ${accent}` },
-                    h(motion.img, { src: img, alt: type, whileHover: { scale: 1.08 }, transition: { duration: .8, ease: [0.22,1,0.36,1] }, className: "absolute inset-0 h-full w-full object-cover opacity-80" }),
+                    h(motion.img, { src: img, alt: type, whileHover: { scale: 1.08 }, transition: { duration: .8, ease: [0.22,1,0.36,1] }, className: "absolute inset-0 h-full w-full object-cover opacity-90" }),
                     h("div", { className: "absolute inset-6 z-[2] border border-white/45" }),
                     h("div", { className: "absolute left-8 top-8 z-[3] rounded-full bg-white/82 px-3 py-1 text-xs font-semibold uppercase tracking-[.22em] text-ink shadow-sm backdrop-blur-xl" }, `0${index + 1}`),
-                    h(motion.div, { whileHover: { rotate: index === 1 ? -1.5 : 1.5 }, className: "project-info-panel absolute bottom-8 left-8 right-8 z-[3] p-6 text-ink" },
-                      h("p", { className: "text-sm font-semibold text-white/72" }, type),
-                      h("h3", { className: "mt-3 text-4xl font-semibold text-white" }, title),
-                      h("p", { className: "mt-3 text-xs font-semibold uppercase tracking-[.22em] text-white/74" }, "点击预览大图"),
-                      h("div", { className: "mt-5 h-1.5 overflow-hidden rounded-full bg-white/24" },
-                        h(motion.div, { initial: { width: "28%" }, whileInView: { width: `${78 + index * 6}%` }, viewport: { once: true }, transition: { duration: 1, delay: .2 }, className: "h-full rounded-full bg-white" })
+                    h(motion.div, { whileHover: { y: -3 }, className: "project-info-panel absolute bottom-6 left-6 right-6 z-[3] p-5" },
+                      h("p", { className: "project-info-kicker text-sm font-semibold" }, type),
+                      h("h3", { className: "project-info-title mt-3 text-4xl font-semibold" }, title),
+                      h("p", { className: "project-info-action mt-3 text-xs font-semibold uppercase tracking-[.22em]" }, "点击预览大图"),
+                      h("div", { className: "project-info-track mt-5 h-1.5 overflow-hidden rounded-full" },
+                        h(motion.div, { initial: { width: "28%" }, whileInView: { width: `${78 + index * 6}%` }, viewport: { once: true }, transition: { duration: 1, delay: .2 }, className: "project-info-bar h-full rounded-full" })
                       )
                     )
                   ),
@@ -353,7 +372,7 @@
       }
       createRoot(document.getElementById("root")).render(h(App));
     </script>
-    <link rel="stylesheet" href="./ai-assistant.css?v=visual-mobile-1" />
-    <script defer src="./ai-assistant.js?v=visual-mobile-1"></script>
+    <link rel="stylesheet" href="./ai-assistant.css?v=visual-mobile-2" />
+    <script defer src="./ai-assistant.js?v=visual-mobile-2"></script>
   </body>
 </html>
