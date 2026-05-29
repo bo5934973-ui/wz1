@@ -63,6 +63,27 @@
       .image-sheen:hover::after {
         transform: translateX(120%);
       }
+      .project-info-panel {
+        background:
+          linear-gradient(135deg, rgba(22, 27, 30, 0.68), rgba(10, 12, 14, 0.46)),
+          rgba(18, 22, 24, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        box-shadow:
+          0 24px 70px rgba(0, 0, 0, 0.32),
+          inset 0 1px 0 rgba(255, 255, 255, 0.24);
+        -webkit-backdrop-filter: blur(26px) saturate(1.45);
+        backdrop-filter: blur(26px) saturate(1.45);
+      }
+      .project-card-image::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background:
+          linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.34)),
+          radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.24), transparent 42%);
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
@@ -165,17 +186,16 @@
             h("div", { className: "grid gap-5 lg:grid-cols-3" },
               ...projects.map(([title, type, summary, accent, img], index) =>
                 h(motion.article, { ...fade, onClick: () => openImage(title, img, type), whileHover: { y: -10 }, whileTap: { scale: .985 }, transition: { duration: .45, ease: [0.22, 1, 0.36, 1] }, key: title, className: "group cursor-pointer overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/72 shadow-sm backdrop-blur-xl" },
-                  h("div", { className: `relative h-80 overflow-hidden bg-gradient-to-br ${accent}` },
+                  h("div", { className: `project-card-image relative h-80 overflow-hidden bg-gradient-to-br ${accent}` },
                     h(motion.img, { src: img, alt: type, whileHover: { scale: 1.08 }, transition: { duration: .8, ease: [0.22,1,0.36,1] }, className: "absolute inset-0 h-full w-full object-cover opacity-80" }),
-                    h("div", { className: "absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/15" }),
-                    h("div", { className: "absolute inset-6 border border-white/35" }),
-                    h("div", { className: "absolute left-8 top-8 rounded-full bg-white/20 px-3 py-1 text-xs uppercase tracking-[.22em] text-white backdrop-blur-xl" }, `0${index + 1}`),
-                    h(motion.div, { whileHover: { rotate: index === 1 ? -1.5 : 1.5 }, className: "absolute bottom-8 left-8 right-8 bg-white/94 p-6 text-ink shadow-soft backdrop-blur-xl" },
-                      h("p", { className: "text-sm text-mute" }, type),
-                      h("h3", { className: "mt-3 text-4xl font-semibold" }, title),
-                      h("p", { className: "mt-3 text-xs font-semibold uppercase tracking-[.22em] text-zinc-400" }, "点击预览大图"),
-                      h("div", { className: "mt-5 h-1.5 overflow-hidden rounded-full bg-zinc-200" },
-                        h(motion.div, { initial: { width: "28%" }, whileInView: { width: `${78 + index * 6}%` }, viewport: { once: true }, transition: { duration: 1, delay: .2 }, className: "h-full rounded-full bg-ink" })
+                    h("div", { className: "absolute inset-6 z-[2] border border-white/45" }),
+                    h("div", { className: "absolute left-8 top-8 z-[3] rounded-full bg-white/82 px-3 py-1 text-xs font-semibold uppercase tracking-[.22em] text-ink shadow-sm backdrop-blur-xl" }, `0${index + 1}`),
+                    h(motion.div, { whileHover: { rotate: index === 1 ? -1.5 : 1.5 }, className: "project-info-panel absolute bottom-8 left-8 right-8 z-[3] p-6 text-ink" },
+                      h("p", { className: "text-sm font-semibold text-white/72" }, type),
+                      h("h3", { className: "mt-3 text-4xl font-semibold text-white" }, title),
+                      h("p", { className: "mt-3 text-xs font-semibold uppercase tracking-[.22em] text-white/74" }, "点击预览大图"),
+                      h("div", { className: "mt-5 h-1.5 overflow-hidden rounded-full bg-white/24" },
+                        h(motion.div, { initial: { width: "28%" }, whileInView: { width: `${78 + index * 6}%` }, viewport: { once: true }, transition: { duration: 1, delay: .2 }, className: "h-full rounded-full bg-white" })
                       )
                     )
                   ),
@@ -333,7 +353,7 @@
       }
       createRoot(document.getElementById("root")).render(h(App));
     </script>
-    <link rel="stylesheet" href="./ai-assistant.css?v=scope-wide-1" />
-    <script defer src="./ai-assistant.js?v=scope-wide-1"></script>
+    <link rel="stylesheet" href="./ai-assistant.css?v=visual-mobile-1" />
+    <script defer src="./ai-assistant.js?v=visual-mobile-1"></script>
   </body>
 </html>
