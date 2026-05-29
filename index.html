@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>视觉设计师作品集</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              ink: "#161616",
+              mute: "#6e6e73",
+              paper: "#f5f5f7",
+              line: "#d8d8de"
+            },
+            boxShadow: {
+              soft: "0 28px 90px rgba(20,20,25,.10)"
+            }
+          }
+        }
+      };
+    </script>
+    <style>
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,.96), rgba(245,245,247,.98)),
+          #f5f5f7;
+        color: #161616;
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background-image:
+          linear-gradient(rgba(22,22,22,.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(22,22,22,.035) 1px, transparent 1px);
+        background-size: 64px 64px;
+        mask-image: linear-gradient(to bottom, black, transparent 76%);
+      }
+      .poster-grid {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, rgba(255,255,255,.11) 1px, transparent 1px),
+          linear-gradient(rgba(255,255,255,.11) 1px, transparent 1px);
+        background-size: 42px 42px;
+      }
+      .image-sheen::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,.32) 48%, transparent 72%);
+        transform: translateX(-120%);
+        transition: transform .8s cubic-bezier(.22,1,.36,1);
+      }
+      .image-sheen:hover::after {
+        transform: translateX(120%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module">
+      import React from "react";
+      import { createRoot } from "react-dom/client";
+      import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
+
+      const h = React.createElement;
+      const projects = [
+        ["PROJECT 01", "品牌视觉项目", "项目内容暂略，后续可补充品牌、海报、包装或数字视觉相关案例。", "from-stone-950 via-stone-800 to-zinc-500", "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1400&q=88"],
+        ["PROJECT 02", "平面设计项目", "项目内容暂略，后续可补充设计目标、视觉策略和最终落地成果。", "from-blue-600 via-sky-400 to-rose-400", "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=1400&q=88"],
+        ["PROJECT 03", "品牌传播项目", "项目内容暂略，后续可补充作品图片、设计说明和项目时间。", "from-emerald-400 via-teal-500 to-slate-900", "https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?auto=format&fit=crop&w=1400&q=88"]
+      ];
+      const gallery = [
+        ["字体与版式", "https://images.unsplash.com/photo-1523726491678-bf852e717f6a?auto=format&fit=crop&w=1000&q=88"],
+        ["品牌物料", "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1000&q=88"],
+        ["色彩实验", "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=88"],
+        ["创意工作台", "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1000&q=88"]
+      ];
+      const lightboxImages = [
+        ["Visual Direction", "视觉设计工作台", "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&w=1600&q=90"],
+        ...projects.map(([title, type, summary, accent, img]) => [title, type, img]),
+        ...gallery.map(([title, img]) => [title, "Design Preview", img])
+      ];
+      const contact = {
+        email: "jie121203@gmail.com",
+        phone: "15224036632"
+      };
+      const skills = ["品牌识别", "海报与版式", "包装设计", "视觉系统", "数字界面视觉", "设计规范", "字体与网格", "创意提案"];
+      const fade = {
+        initial: { opacity: 0, y: 26 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true, amount: .25 },
+        transition: { duration: .7, ease: [0.22, 1, 0.36, 1] }
+      };
+
+      function App() {
+        const [lightbox, setLightbox] = React.useState(null);
+        const [contactOpen, setContactOpen] = React.useState(false);
+        const { scrollYProgress } = useScroll();
+        const scaleX = useSpring(scrollYProgress, { stiffness: 90, damping: 24 });
+        const heroY = useTransform(scrollYProgress, [0, .32], [0, -70]);
+        const heroOpacity = useTransform(scrollYProgress, [0, .28], [1, .38]);
+        const openImage = (title, src, subtitle = "Design Preview") => {
+          const index = lightboxImages.findIndex((image) => image[2] === src || image[0] === title);
+          setLightbox({ title, src, subtitle, index: index >= 0 ? index : 0 });
+        };
+        const showLightboxImage = (step) => {
+          setLightbox((current) => {
+            if (!current) return current;
+            const nextIndex = (current.index + step + lightboxImages.length) % lightboxImages.length;
+            const [title, subtitle, src] = lightboxImages[nextIndex];
+            return { title, subtitle, src, index: nextIndex };
+          });
+        };
+        return h("main", { className: "min-h-screen bg-paper text-ink" },
+          h(motion.div, { className: "fixed left-0 top-0 z-50 h-1 origin-left bg-ink", style: { scaleX, width: "100%" } }),
+          h("nav", { className: "fixed left-1/2 top-5 z-40 w-[min(92vw,980px)] -translate-x-1/2 rounded-full border border-white/70 bg-white/70 px-4 py-3 shadow-sm backdrop-blur-2xl" },
+            h("div", { className: "flex items-center justify-between gap-4 text-sm" },
+              h("a", { href: "#top", className: "font-semibold" }, "邱深杰"),
+              h("div", { className: "hidden items-center gap-7 text-mute md:flex" },
+                h("a", { href: "#work" }, "作品"), h("a", { href: "#about" }, "关于"), h("a", { href: "#experience" }, "经历")
+              ),
+              h("button", { type: "button", onClick: () => setContactOpen(true), className: "inline-flex h-9 items-center rounded-full bg-ink px-4 font-semibold text-white transition hover:scale-105" }, "联系")
+            )
+          ),
+          h("section", { id: "top", className: "relative overflow-hidden px-6 pb-24 pt-36 md:pb-32 md:pt-44" },
+            h("div", { className: "mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-[1.05fr_.95fr]" },
+              h(motion.div, { style: { y: heroY, opacity: heroOpacity }, className: "max-w-3xl" },
+                h(motion.p, { ...fade, className: "mb-7 inline-flex rounded-full border border-line bg-white/60 px-4 py-2 text-sm text-mute backdrop-blur-xl" }, "邱深杰 / 平面设计师"),
+                h(motion.h1, { ...fade, className: "max-w-4xl text-6xl font-semibold leading-[.98] tracking-normal md:text-8xl" }, "让视觉更有力量"),
+                h(motion.p, { ...fade, className: "mt-8 max-w-2xl text-xl leading-8 text-mute md:text-2xl md:leading-9" }, "我是一名阳光开朗、执行力强的平面设计师，擅长把想法转化为简洁、稳定且具有视觉吸引力的设计成果。"),
+                h(motion.div, { ...fade, className: "mt-10 flex flex-wrap gap-3" },
+                  h("a", { href: "#work", className: "inline-flex rounded-full bg-ink px-6 py-3 font-semibold text-white" }, "查看作品"),
+                  h("a", { href: "#about", className: "inline-flex rounded-full border border-line bg-white/70 px-6 py-3 font-semibold" }, "了解更多")
+                )
+              ),
+              h(motion.div, { initial: { opacity: 0, scale: .96, y: 28 }, animate: { opacity: 1, scale: 1, y: 0 }, transition: { duration: .9 }, className: "relative min-h-[520px]" },
+                h(motion.button, { type: "button", onClick: () => openImage("Visual Direction", "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&w=1600&q=90", "视觉设计工作台"), whileHover: { scale: 1.015 }, whileTap: { scale: .985 }, transition: { duration: .45 }, className: "absolute right-0 top-0 h-[500px] w-full max-w-[470px] overflow-hidden rounded-[2rem] bg-zinc-950 text-left shadow-soft image-sheen" },
+                  h("img", { src: "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&w=1200&q=85", alt: "视觉设计工作台", className: "absolute inset-0 h-full w-full object-cover opacity-55 mix-blend-luminosity" }),
+                  h("div", { className: "absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/15" }),
+                  h("div", { className: "poster-grid" }),
+                  h("div", { className: "absolute inset-x-8 top-8 flex justify-between text-white/70" }, h("span", { className: "text-xs uppercase tracking-[.3em]" }, "Selected Identity"), h("span", null, "✦")),
+                  h("div", { className: "absolute left-10 top-24 h-52 w-52 rounded-full border border-white/30" }),
+                  h("div", { className: "absolute right-8 top-28 h-44 w-32 bg-white" }),
+                  h("div", { className: "absolute bottom-36 right-12 h-16 w-44 bg-[#f25c54]" }),
+                  h("div", { className: "absolute bottom-10 left-8 right-8 text-white" }, h("p", { className: "text-sm text-white/55" }, "Brand / Editorial / Digital"), h("h2", { className: "mt-3 text-5xl font-semibold leading-none" }, "Visual Direction"))
+                ),
+                h(motion.div, { animate: { y: [0, -14, 0] }, transition: { repeat: Infinity, duration: 6, ease: "easeInOut" }, className: "absolute bottom-3 left-0 hidden w-[285px] overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/75 p-3 shadow-soft backdrop-blur-2xl sm:block" },
+                  h("div", { className: "grid grid-cols-3 gap-2" },
+                    ...gallery.slice(0, 3).map(([label, img]) => h(motion.button, { key: label, type: "button", onClick: () => openImage(label, img), whileHover: { scale: 1.06 }, whileTap: { scale: .96 }, className: "overflow-hidden rounded-2xl" }, h("img", { src: img, alt: label, className: "h-24 w-full object-cover" })))
+                  )
+                )
+              )
+            )
+          ),
+          Section("work", "Selected Work", "精选项目暂略，作品内容可继续补充。",
+            h("div", { className: "grid gap-5 lg:grid-cols-3" },
+              ...projects.map(([title, type, summary, accent, img], index) =>
+                h(motion.article, { ...fade, onClick: () => openImage(title, img, type), whileHover: { y: -10 }, whileTap: { scale: .985 }, transition: { duration: .45, ease: [0.22, 1, 0.36, 1] }, key: title, className: "group cursor-pointer overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/72 shadow-sm backdrop-blur-xl" },
+                  h("div", { className: `relative h-80 overflow-hidden bg-gradient-to-br ${accent}` },
+                    h(motion.img, { src: img, alt: type, whileHover: { scale: 1.08 }, transition: { duration: .8, ease: [0.22,1,0.36,1] }, className: "absolute inset-0 h-full w-full object-cover opacity-80" }),
+                    h("div", { className: "absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/15" }),
+                    h("div", { className: "absolute inset-6 border border-white/35" }),
+                    h("div", { className: "absolute left-8 top-8 rounded-full bg-white/20 px-3 py-1 text-xs uppercase tracking-[.22em] text-white backdrop-blur-xl" }, `0${index + 1}`),
+                    h(motion.div, { whileHover: { rotate: index === 1 ? -1.5 : 1.5 }, className: "absolute bottom-8 left-8 right-8 bg-white/94 p-6 text-ink shadow-soft backdrop-blur-xl" },
+                      h("p", { className: "text-sm text-mute" }, type),
+                      h("h3", { className: "mt-3 text-4xl font-semibold" }, title),
+                      h("p", { className: "mt-3 text-xs font-semibold uppercase tracking-[.22em] text-zinc-400" }, "点击预览大图"),
+                      h("div", { className: "mt-5 h-1.5 overflow-hidden rounded-full bg-zinc-200" },
+                        h(motion.div, { initial: { width: "28%" }, whileInView: { width: `${78 + index * 6}%` }, viewport: { once: true }, transition: { duration: 1, delay: .2 }, className: "h-full rounded-full bg-ink" })
+                      )
+                    )
+                  ),
+                  h("div", { className: "p-7" }, h("p", { className: "leading-7 text-mute" }, summary))
+                )
+              )
+            )
+          ),
+          Section("visuals", "Visual Moodboard", "更多设计相关视觉灵感，让页面更像作品集。",
+            h("div", { className: "grid gap-5 md:grid-cols-4" },
+              ...gallery.map(([label, img], index) =>
+                h(motion.figure, { ...fade, onClick: () => openImage(label, img), whileHover: { y: -8, scale: 1.02 }, whileTap: { scale: .985 }, transition: { duration: .45 }, key: label, className: `${index === 0 ? "md:col-span-2 md:row-span-2" : ""} group relative min-h-[260px] cursor-pointer overflow-hidden rounded-[1.75rem] bg-zinc-900 shadow-soft image-sheen` },
+                  h(motion.img, { src: img, alt: label, whileHover: { scale: 1.08 }, transition: { duration: .8 }, className: "absolute inset-0 h-full w-full object-cover opacity-85" }),
+                  h("div", { className: "absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/5" }),
+                  h("figcaption", { className: "absolute bottom-5 left-5 right-5 flex items-center justify-between text-white" },
+                    h("span", { className: "text-lg font-semibold" }, label),
+                    h(motion.span, { whileHover: { x: 3 }, className: "rounded-full border border-white/35 px-3 py-1 text-xs text-white/90 backdrop-blur" }, "点击预览")
+                  )
+                )
+              )
+            )
+          ),
+          Section("about", "Profile", "保持积极沟通，也重视设计执行的准确度。",
+            h("div", { className: "grid gap-8 lg:grid-cols-[.9fr_1.1fr]" },
+              h(motion.div, { ...fade, className: "rounded-[1.75rem] bg-ink p-8 text-white shadow-soft" },
+                h("p", { className: "text-3xl font-semibold leading-tight" }, "阳光开朗，能力强，能快速理解需求，并把设计想法推进到清晰可用的视觉结果。"),
+                h("div", { className: "mt-12 grid grid-cols-3 gap-4 border-t border-white/15 pt-8" },
+                  Metric("8+", "年设计经验"), Metric("36", "品牌项目"), Metric("12", "行业覆盖")
+                )
+              ),
+              h("div", { className: "grid content-start gap-4 sm:grid-cols-2" },
+                ...skills.map(skill => h(motion.div, { ...fade, key: skill, className: "rounded-3xl border border-white/80 bg-white/70 p-5 font-medium shadow-sm backdrop-blur-xl" }, skill))
+              )
+            )
+          ),
+          Section("experience", "Experience", "持续积累平面设计经验，保持稳定输出。",
+            h("div", { className: "grid gap-5" },
+              [["2023 - 现在", "自由视觉设计师"], ["2020 - 2023", "高级平面设计师"], ["2018 - 2020", "视觉设计师"]].map(([period, role]) =>
+                h(motion.div, { ...fade, key: period, className: "grid gap-5 rounded-[1.5rem] border border-white/80 bg-white/72 p-6 shadow-sm backdrop-blur-xl md:grid-cols-[180px_1fr]" },
+                  h("p", { className: "text-sm font-medium text-mute" }, period),
+                  h("div", null, h("h3", { className: "text-2xl font-semibold" }, role), h("p", { className: "mt-2 leading-7 text-mute" }, "负责品牌视觉、传播物料、设计系统和跨渠道视觉一致性。"))
+                )
+              )
+            )
+          ),
+          h(ContactChooser, { open: contactOpen, onClose: () => setContactOpen(false) }),
+          h(Lightbox, { item: lightbox, onClose: () => setLightbox(null), onPrevious: () => showLightboxImage(-1), onNext: () => showLightboxImage(1) })
+        );
+      }
+      function ContactChooser({ open, onClose }) {
+        const callReady = Boolean(contact.phone);
+        const chooseCall = () => {
+          if (callReady) window.location.href = `tel:${contact.phone}`;
+        };
+        const chooseEmail = () => {
+          window.location.href = `mailto:${contact.email}`;
+        };
+        return h(AnimatePresence, null,
+          open && h(motion.div, {
+            className: "fixed inset-0 z-[90] flex items-center justify-center bg-black/55 px-5 backdrop-blur-xl",
+            initial: { opacity: 0 },
+            animate: { opacity: 1 },
+            exit: { opacity: 0 },
+            onClick: onClose
+          },
+            h(motion.div, {
+              className: "w-[min(92vw,520px)] rounded-[2rem] bg-white p-6 shadow-soft",
+              initial: { opacity: 0, y: 24, scale: .95 },
+              animate: { opacity: 1, y: 0, scale: 1 },
+              exit: { opacity: 0, y: 18, scale: .97 },
+              transition: { duration: .36, ease: [0.22, 1, 0.36, 1] },
+              onClick: (event) => event.stopPropagation()
+            },
+              h("div", { className: "mb-6 flex items-start justify-between gap-5" },
+                h("div", null,
+                  h("p", { className: "text-sm font-semibold uppercase tracking-[.22em] text-mute" }, "Contact"),
+                  h("h3", { className: "mt-2 text-3xl font-semibold" }, "选择联系方式")
+                ),
+                h("button", { type: "button", onClick: onClose, className: "rounded-full bg-zinc-100 px-4 py-2 text-sm font-semibold transition hover:bg-zinc-200" }, "关闭")
+              ),
+              h("div", { className: "grid gap-3 sm:grid-cols-2" },
+                h(motion.button, {
+                  type: "button",
+                  onClick: chooseCall,
+                  disabled: !callReady,
+                  whileHover: callReady ? { y: -4 } : {},
+                  whileTap: callReady ? { scale: .97 } : {},
+                  className: `rounded-[1.4rem] border p-5 text-left transition ${callReady ? "border-zinc-200 bg-zinc-950 text-white" : "cursor-not-allowed border-zinc-200 bg-zinc-100 text-zinc-400"}`
+                },
+                  h("span", { className: "text-sm font-medium opacity-70" }, "Phone"),
+                  h("strong", { className: "mt-3 block text-xl" }, callReady ? "打电话" : "电话待补充"),
+                  h("span", { className: "mt-3 block text-sm opacity-70" }, callReady ? contact.phone : "提供手机号后自动启用")
+                ),
+                h(motion.button, {
+                  type: "button",
+                  onClick: chooseEmail,
+                  whileHover: { y: -4 },
+                  whileTap: { scale: .97 },
+                  className: "rounded-[1.4rem] border border-zinc-200 bg-white p-5 text-left transition hover:border-zinc-950"
+                },
+                  h("span", { className: "text-sm font-medium text-mute" }, "Email"),
+                  h("strong", { className: "mt-3 block text-xl" }, "发邮件"),
+                  h("span", { className: "mt-3 block break-all text-sm text-mute" }, contact.email)
+                )
+              )
+            )
+          )
+        );
+      }
+      function Lightbox({ item, onClose, onPrevious, onNext }) {
+        return h(AnimatePresence, null,
+          item && h(motion.div, {
+            className: "fixed inset-0 z-[80] flex items-center justify-center bg-black/78 px-5 py-8 backdrop-blur-2xl",
+            initial: { opacity: 0 },
+            animate: { opacity: 1 },
+            exit: { opacity: 0 },
+            onClick: onClose
+          },
+            h(motion.div, {
+              className: "relative w-[min(94vw,1080px)] overflow-hidden rounded-[2rem] bg-white shadow-soft",
+              initial: { opacity: 0, y: 34, scale: .94 },
+              animate: { opacity: 1, y: 0, scale: 1 },
+              exit: { opacity: 0, y: 24, scale: .96 },
+              transition: { duration: .45, ease: [0.22, 1, 0.36, 1] },
+              onClick: (event) => event.stopPropagation()
+            },
+              h("button", { type: "button", onClick: onClose, className: "absolute right-5 top-5 z-10 rounded-full bg-black/70 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-black" }, "关闭"),
+              h("button", { type: "button", onClick: onPrevious, className: "absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-3xl font-semibold leading-none text-white backdrop-blur transition hover:bg-black md:left-5", "aria-label": "上一张" }, "‹"),
+              h("button", { type: "button", onClick: onNext, className: "absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-3xl font-semibold leading-none text-white backdrop-blur transition hover:bg-black md:right-5", "aria-label": "下一张" }, "›"),
+              h("img", { src: item.src, alt: item.title, className: "max-h-[76vh] w-full object-cover" }),
+              h("div", { className: "flex items-center justify-between gap-5 px-6 py-5" },
+                h("div", null,
+                  h("p", { className: "text-sm font-medium text-mute" }, item.subtitle),
+                  h("h3", { className: "mt-1 text-2xl font-semibold" }, item.title)
+                ),
+                h("span", { className: "hidden rounded-full border border-line px-4 py-2 text-sm text-mute sm:inline-flex" }, "点击空白处关闭")
+              )
+            )
+          )
+        );
+      }
+      function Section(id, eyebrow, title, children) {
+        return h("section", { id, className: "px-6 py-20 md:py-28" },
+          h("div", { className: "mx-auto max-w-6xl" },
+            h(motion.div, { ...fade, className: "mb-12 max-w-3xl" },
+              h("p", { className: "mb-4 text-sm font-semibold uppercase tracking-[.24em] text-mute" }, eyebrow),
+              h("h2", { className: "text-4xl font-semibold leading-tight md:text-6xl" }, title)
+            ),
+            children
+          )
+        );
+      }
+      function Metric(value, label) {
+        return h("div", null, h("p", { className: "text-3xl font-semibold" }, value), h("p", { className: "mt-2 text-xs leading-5 text-white/55" }, label));
+      }
+      createRoot(document.getElementById("root")).render(h(App));
+    </script>
+    <link rel="stylesheet" href="./ai-assistant.css?v=scope-wide-1" />
+    <script defer src="./ai-assistant.js?v=scope-wide-1"></script>
+  </body>
+</html>
